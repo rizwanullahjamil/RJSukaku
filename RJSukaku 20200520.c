@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 
-#define RJ 4                 // 0 no debugging, 1 print solutions, 2 print puzzles, 3 print steps, 4 print steps possibilities in grid, 5 print puzzles in grid
+#define RJ 0                 // 0 no debugging, 1 print solutions, 2 print puzzles, 3 print steps, 4 print steps possibilities in grid, 5 print puzzles in grid
 
 #define ERI(A)          (G[I].g[w[A][6]] | G[I].g[w[A][7]]) & (G[I].g[w[A][12]] | G[I].g[w[A][13]]) & \
                         ~(G[I].g[w[A][8]] | G[I].g[w[A][9]] | G[I].g[w[A][10]] | G[I].g[w[A][11]])
@@ -4360,7 +4360,7 @@ int main (void)
 #if RJ
         printf (" # C%d # P%d # N%ld # H%ld # G%ld # D%ld # %f\n", 81 - q, n[8], n[0], n[1], n[2], n[4], c);
 #endif
-        a = q = -1;
+        a = A = q = -1;
       }
 #if RJ > 1
       if (m != 10 && m != 13 && m != EOF)
