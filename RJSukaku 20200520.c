@@ -4214,10 +4214,10 @@ XYWT1Tf:
             (G[I].g[w[X][16]] & y ? 1 : 0) + (G[I].g[w[X][17]] & y ? 1 : 0) +
             (G[I].g[w[X][18]] & y ? 1 : 0) + (G[I].g[w[X][19]] & y ? 1 : 0) == 2)
           {                  // Digit found Row, Box or Column wise in two Cell positions
-            G[I].g[X] = y;   // Remove BUG+1 other digits from Trivalue removal Cell values
 #if RJ > 2
-            printf ("%d) BUG+1: %d @ %s => -%d @ %s\n", G[I].p, b[y], S[X], b[Z - y], S[X]);
+            printf ("%d) BUG+1: %d @ %s => -%d @ %s\n", G[I].p, b[y], S[X], b[G[I].g[X] - y], S[X]);
 #endif
+            G[I].g[X] = y;   // Remove BUG+1 other digits from Trivalue removal Cell values
             goto START;
           }
       }
