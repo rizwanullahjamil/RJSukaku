@@ -45,7 +45,7 @@ struct
 } G[50];
 
 int I,                       // Iteration/Guess Depth
-    q = -1,                  // Number of unsolved Cell positions Grid wise
+    q = 0,                   // Number of unsolved Cell positions Grid wise
     r[81],                   // Used for sorting and removing each unsolved Cell positions Grid wise
     n[9];                    // Number of Naked singles, Hidden singles, Guesses and Depth Grid wise, solved without guess, maximum guess and depth, number of possibilities
 
@@ -4291,9 +4291,9 @@ int main (void)
   else
     do
     {
-      if ((m = fgetc (o)) != 10 && m != EOF && ++a < 730)
+      if ((m = fgetc (o)) != 10 && m != EOF && a < 728)
       {
-        if (a % 9)
+        if (++a % 9)
         {
           G[0].g[A] |= (m > 48 && m < 58) << (m - 49);
         }
@@ -4301,7 +4301,7 @@ int main (void)
         {
           G[0].g[++A] = (m > 48 && m < 58) << (m - 49);
           G[0].s[A] = 0;
-          r[++q] = A;
+          r[q++] = A;
         }                    // Assign clue Cell positions
         n[8] += m > 48 && m < 58;
       }
@@ -4360,8 +4360,8 @@ int main (void)
 #if RJ
         printf (" # C%d # P%d # N%ld # H%ld # G%ld # D%ld # %f\n", 81 - q, n[8], n[0], n[1], n[2], n[4], c);
 #endif
-        a = A = q = -1;
-        n[8] = 0;
+        a = A = -1;
+        q = n[8] = 0;
       }
 #if RJ > 1
       if (m != 10 && m != 13 && m != EOF)
