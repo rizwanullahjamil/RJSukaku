@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 
-#define RJ 5                 // 0 no debugging, 1 print solutions, 2 print puzzles, 3 print steps, 4 print steps possibilities in grid, 5 print puzzles in grid
+#define RJ 0                 // 0 no debugging, 1 print solutions, 2 print puzzles, 3 print steps, 4 print steps possibilities in grid, 5 print puzzles in grid
 
 #define ERI(A)          (G[I].g[w[A][6]] | G[I].g[w[A][7]]) & (G[I].g[w[A][12]] | G[I].g[w[A][13]]) & \
                         ~(G[I].g[w[A][8]] | G[I].g[w[A][9]] | G[I].g[w[A][10]] | G[I].g[w[A][11]])
@@ -45,7 +45,7 @@ struct
 } G[50];
 
 int I,                       // Iteration/Guess Depth
-    q = 0,                   // Number of unsolved Cell positions Grid wise
+    q,                       // Number of unsolved Cell positions Grid wise
     r[81],                   // Used for sorting and removing each unsolved Cell positions Grid wise
     n[9];                    // Number of Naked singles, Hidden singles, Guesses and Depth Grid wise, solved without guess, maximum guess and depth, number of possibilities
 
@@ -1299,8 +1299,9 @@ START:
                 G[I].g[K[3]] &= ~Y;
               }
 #if RJ > 2
-              printf ("%d)%sSkyscraper: %ss %d wise %d Base %d @ %s %s Cover %d @ r%dc%d r%dc%d => -%d @",
-                G[I].p, A[5] ? " Grouped " : " ", RCB, a - y + 1, Z - y + 1, b[Y], S[K[4]], S[K[5]],
+              printf ("%d)%sSkyscraper: %ss %d %d wise Base %d @ r%dc%d Cover %d @ r%dc%d r%dc%d => -%d @",
+                G[I].p, A[5] ? " Grouped " : " ", RCB, a - y + 1, Z - y + 1, b[Y],
+                ROW (w[K[4]][20] | w[K[5]][20]), COL (w[K[4]][20] | w[K[5]][20]),
                 b[Y], ROW ((K[6] + 1 ? w[K[6]][20] : 0) | (K[7] + 1 ? w[K[7]][20] : 0) |
                 (K[8] + 1 ? w[K[8]][20] : 0)), COL ((K[6] + 1 ? w[K[6]][20] : 0) |
                 (K[7] + 1 ? w[K[7]][20] : 0) | (K[8] + 1 ? w[K[8]][20] : 0)),
@@ -1323,7 +1324,7 @@ START:
     {
       if (!(y = ~G[I].g[a] & (G[I].g[w[a][6]] | G[I].g[w[a][7]]) & (G[I].g[w[a][12]] | G[I].g[w[a][13]])))
         continue;            // Skip for either digit found in ERI Cell values; or not found in mini-Row and mini-Column Cell values
-      int K[6] = { 0,-1,-1},
+      int K[7] = { 0,-1,-1},
           L,
           M;
 
@@ -4081,7 +4082,7 @@ XYWT1Tf:
                 !G[I].g[K[6]] || B[G[I].g[K[0]] | G[I].g[K[2]] | G[I].g[K[4]] | G[I].g[K[6]]] != 4 ||
                              // 2nd Apex Cell position not unsolved; or Apex Cells values and Wing Cells values not four digits; or
                 !((G[I].g[K[0]] | G[I].g[K[6]]) & G[I].g[K[2]]) ||
-                             // No common value in Apex Cells and 1st Wing Cell values; or
+                             // No common digit in Apex Cells and 1st Wing Cell values; or
                 !((G[I].g[K[0]] | G[I].g[K[6]]) & G[I].g[K[4]]))
                 continue;    // No common value in Apex Cells and 2nd Wing Cell values
               if (B[K[7] = G[I].g[K[2]] & G[I].g[K[4]]] == 1)
