@@ -4668,7 +4668,7 @@ int main (void)
           ++t;
           ++u;
 #if RJ
-          printf ("%ld) Error: Unsolvable Sudoku! # U%ld", t, u);
+          printf ("%ld) Error: Unsolvable Sukaku! # U%ld", t, u);
 #endif
         }
 #if RJ
