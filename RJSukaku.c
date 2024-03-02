@@ -424,7 +424,7 @@ int solve ()
       y = 0,                 // 0 = Naked single, 1 = Hidden Single and 2 = Trial & Error
       z = 0;
 
-  while (1)
+  do
   {
 START:
 #if RJ > 3
@@ -4574,12 +4574,9 @@ NHSCF:
     }
     printf ("\n");
 #endif
-    G[I].g[r[G[I].p]] = 0;
-    if (G[I].p + 1 < q)      // Check either iteratively solve for next unsolved Cell position; or all Cell positions solved
-      ++G[I].p;
-    else
-      return 1;
   }
+  while (++G[I].p < q);      // Loop for next unsolved Cell position
+  return 1;
 }
 
 int main (void)
