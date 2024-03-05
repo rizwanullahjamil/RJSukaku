@@ -4574,6 +4574,7 @@ NHSCF:
     }
     printf ("\n");
 #endif
+    G[I].g[r[G[I].p]] = 0;
   }
   while (++G[I].p < q);      // Loop for next unsolved Cell position
   return 1;
