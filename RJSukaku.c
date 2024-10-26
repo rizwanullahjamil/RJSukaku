@@ -2117,7 +2117,9 @@ static const int b[512] = {  // Bitwise to digit Cell values
   { 0, 8}, {12,20}, {402653184,1610612736}, { 3, 9},
   { 4,10}, { 5,11}, { 6,12}, { 7,13}, { 8,14}, { 9,15},
   {27,54}, {54,81}, { 9,18}, {18,27}, { 3,76}, { 6,79},
-  { 1,74}, { 2,75}};
+  { 1,74}, { 2,75}},
+           T[9] = {          // Pattern Overlay Method Steps
+  863,287,47,11, 5, 1, 0, 0};
 
 #if RJ > 3
 void prn (void)
@@ -6326,6 +6328,8 @@ XYWT1Tf:
         if (B > 7)           // Check digit found in all Rows
           for (++A[0][1], B = 0; B < 8; ++B)
             ++A[K[B]][1];
+        else
+          X += T[B];         // Steps Template
       }
       if (!A[0][1])
         continue;
