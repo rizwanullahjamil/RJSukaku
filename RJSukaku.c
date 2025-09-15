@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 
-#define RJ 6                 // 0 no debugging, 1 print solutions, 2 print puzzles, 3 print steps, 4 print steps possibilities in grid, 5 print puzzles in grid
+#define RJ 6                 // 0 no debugging, 1 print solutions, 2 print puzzles, 3 print steps, 4 print steps possibilities in grid, 5 print puzzles in grid, 6 print POM Templates
 
 #define ERI(A)          (G[I].g[w[A][6]] | G[I].g[w[A][7]]) & (G[I].g[w[A][12]] | G[I].g[w[A][13]]) & \
                         ~(G[I].g[w[A][8]] | G[I].g[w[A][9]] | G[I].g[w[A][10]] | G[I].g[w[A][11]])
@@ -17,9 +17,6 @@
                         (G[I].g[Z = B] | G[I].g[w[Z][W[3][D]]] | G[I].g[w[Z][W[4][D]]]) & \
                         ~(G[I].g[C] | G[I].g[w[C][W[3][D]]] | G[I].g[w[C][W[4][D]]])
 #define COL(A)          b[(A) & 511]
-#define SWAP            { a = A[X][0]; \
-                        A[X][0] = A[Z][0]; \
-                        A[Z][0] = a; }
 #if RJ > 2
 #define RCB             y < 9 ? "Row" : y < 18 ? "Column" : "Box"
 #define LBN(A)          b[(y < 9 ? w[A][20] >> 18 : y < 18 ? w[A][20] : w[A][20] >> 9) & 511]
@@ -50,7 +47,7 @@ struct
 int I,                       // Iteration/Guess Depth
     q,                       // Number of unsolved Cell positions Grid wise
     r[81],                   // Used for sorting and removing each unsolved Cell positions Grid wise
-    n[9];                    // Number of Naked singles, Hidden singles, Guesses and Depth Grid wise, solved without guess, maximum guess and depth, number of possibilities
+    n[9];                    // Number of Naked Singles, Hidden Singles, Guesses and Depth Grid wise, solved without guess, maximum guess and depth, number of possibilities
 
 static const int b[512] = {  // Bitwise to digit Cell values
           0,        1,        2,       12,        3,       13,       23,      123,
@@ -2339,18 +2336,22 @@ START:
                 (G[I].g[j[a][8]] & Y ? w[j[a][8]][20] : 0)));
           else
           {
-            if (G[I].g[j[a][9]] & Y)
-              printf (" %s", S[j[a][9]]);
-            if (G[I].g[j[a][10]] & Y)
-              printf (" %s", S[j[a][10]]);
-            if (G[I].g[j[a][11]] & Y)
-              printf (" %s", S[j[a][11]]);
-            if (G[I].g[j[a][12]] & Y)
-              printf (" %s", S[j[a][12]]);
-            if (G[I].g[j[a][13]] & Y)
-              printf (" %s", S[j[a][13]]);
-            if (G[I].g[j[a][14]] & Y)
-              printf (" %s", S[j[a][14]]);
+            if ((G[I].g[j[a][9]] | G[I].g[j[a][10]] | G[I].g[j[a][11]]) & Y)
+              printf (" r%dc%d",
+                ROW ((G[I].g[j[a][9]] & Y ? w[j[a][9]][20] : 0) |
+                  (G[I].g[j[a][10]] & Y ? w[j[a][10]][20] : 0) |
+                  (G[I].g[j[a][11]] & Y ? w[j[a][11]][20] : 0)),
+                COL ((G[I].g[j[a][9]] & Y ? w[j[a][9]][20] : 0) |
+                  (G[I].g[j[a][10]] & Y ? w[j[a][10]][20] : 0) |
+                  (G[I].g[j[a][11]] & Y ? w[j[a][11]][20] : 0)));
+            if ((G[I].g[j[a][12]] | G[I].g[j[a][13]] | G[I].g[j[a][14]]) & Y)
+              printf (" r%dc%d",
+                ROW ((G[I].g[j[a][12]] & Y ? w[j[a][12]][20] : 0) |
+                  (G[I].g[j[a][13]] & Y ? w[j[a][13]][20] : 0) |
+                  (G[I].g[j[a][14]] & Y ? w[j[a][14]][20] : 0)),
+                COL ((G[I].g[j[a][12]] & Y ? w[j[a][12]][20] : 0) |
+                  (G[I].g[j[a][13]] & Y ? w[j[a][13]][20] : 0) |
+                  (G[I].g[j[a][14]] & Y ? w[j[a][14]][20] : 0)));
           }
           printf ("\n");
 #endif
@@ -2377,17 +2378,40 @@ START:
         G[I].g[j[a][12]] | G[I].g[j[a][13]] | G[I].g[j[a][14]]) & Y))
       {                      // Locked pair found
 #if RJ > 2
-        printf ("%d) Locked pair: %d @ r%dc%d => -%d @ r%dc%d r%dc%d\n",
+        printf ("%d) Locked pair: %d @ r%dc%d => -%d @ r%dc%d",
           G[I].p, b[Y], ROW (w[j[a][!X]][20] | w[j[a][X ? 3 - X : 2]][20]),
           COL (w[j[a][!X]][20] | w[j[a][X ? 3 - X : 2]][20]), b[Y],
-          ROW (w[j[a][X]][20] | w[j[a][3]][20] | w[j[a][4]][20] |
-            w[j[a][5]][20] | w[j[a][6]][20] | w[j[a][7]][20] | w[j[a][8]][20]),
-          COL (w[j[a][X]][20] | w[j[a][3]][20] | w[j[a][4]][20] |
-            w[j[a][5]][20] | w[j[a][6]][20] | w[j[a][7]][20] | w[j[a][8]][20]),
-          ROW (w[j[a][9]][20] | w[j[a][10]][20] | w[j[a][11]][20] |
-            w[j[a][12]][20] | w[j[a][13]][20] | w[j[a][14]][20]),
-          COL (w[j[a][9]][20] | w[j[a][10]][20] | w[j[a][11]][20] |
-            w[j[a][12]][20] | w[j[a][13]][20] | w[j[a][14]][20]));
+          ROW ((G[I].g[j[a][X]] & Y ? w[j[a][X]][20] : 0) |
+            (G[I].g[j[a][3]] & Y ? w[j[a][3]][20] : 0) |
+            (G[I].g[j[a][4]] & Y ? w[j[a][4]][20] : 0) |
+            (G[I].g[j[a][5]] & Y ? w[j[a][5]][20] : 0) |
+            (G[I].g[j[a][6]] & Y ? w[j[a][6]][20] : 0) |
+            (G[I].g[j[a][7]] & Y ? w[j[a][7]][20] : 0) |
+            (G[I].g[j[a][8]] & Y ? w[j[a][8]][20] : 0)),
+          COL ((G[I].g[j[a][X]] & Y ? w[j[a][X]][20] : 0) |
+            (G[I].g[j[a][3]] & Y ? w[j[a][3]][20] : 0) |
+            (G[I].g[j[a][4]] & Y ? w[j[a][4]][20] : 0) |
+            (G[I].g[j[a][5]] & Y ? w[j[a][5]][20] : 0) |
+            (G[I].g[j[a][6]] & Y ? w[j[a][6]][20] : 0) |
+            (G[I].g[j[a][7]] & Y ? w[j[a][7]][20] : 0) |
+            (G[I].g[j[a][8]] & Y ? w[j[a][8]][20] : 0)));
+        if ((G[I].g[j[a][9]] | G[I].g[j[a][10]] | G[I].g[j[a][11]]) & Y)
+          printf (" r%dc%d",
+            ROW ((G[I].g[j[a][9]] & Y ? w[j[a][9]][20] : 0) |
+              (G[I].g[j[a][10]] & Y ? w[j[a][10]][20] : 0) |
+              (G[I].g[j[a][11]] & Y ? w[j[a][11]][20] : 0)),
+            COL ((G[I].g[j[a][9]] & Y ? w[j[a][9]][20] : 0) |
+              (G[I].g[j[a][10]] & Y ? w[j[a][10]][20] : 0) |
+              (G[I].g[j[a][11]] & Y ? w[j[a][11]][20] : 0)));
+        if ((G[I].g[j[a][12]] | G[I].g[j[a][13]] | G[I].g[j[a][14]]) & Y)
+          printf (" r%dc%d",
+            ROW ((G[I].g[j[a][12]] & Y ? w[j[a][12]][20] : 0) |
+              (G[I].g[j[a][13]] & Y ? w[j[a][13]][20] : 0) |
+              (G[I].g[j[a][14]] & Y ? w[j[a][14]][20] : 0)),
+            COL ((G[I].g[j[a][12]] & Y ? w[j[a][12]][20] : 0) |
+              (G[I].g[j[a][13]] & Y ? w[j[a][13]][20] : 0) |
+              (G[I].g[j[a][14]] & Y ? w[j[a][14]][20] : 0)));
+        printf ("\n");
 #endif
                              // Drop Locked pair Cell values from Units other Cell positions
         G[I].g[j[a][X]] &= ~Y;
@@ -2412,6 +2436,40 @@ START:
         (G[I].g[j[a][9]] | G[I].g[j[a][10]] | G[I].g[j[a][11]] |
         G[I].g[j[a][12]] | G[I].g[j[a][13]] | G[I].g[j[a][14]]) & Y))
       {                      // Locked triple found
+#if RJ > 2
+        printf ("%d) Locked triple: %d @ r%dc%d => -%d @ r%dc%d",
+          G[I].p, b[Y], ROW (w[j[a][0]][20] | w[j[a][1]][20] | w[j[a][2]][20]),
+          COL (w[j[a][0]][20] | w[j[a][1]][20] | w[j[a][2]][20]), b[Y],
+          ROW ((G[I].g[j[a][3]] & Y ? w[j[a][3]][20] : 0) |
+            (G[I].g[j[a][4]] & Y ? w[j[a][4]][20] : 0) |
+            (G[I].g[j[a][5]] & Y ? w[j[a][5]][20] : 0) |
+            (G[I].g[j[a][6]] & Y ? w[j[a][6]][20] : 0) |
+            (G[I].g[j[a][7]] & Y ? w[j[a][7]][20] : 0) |
+            (G[I].g[j[a][8]] & Y ? w[j[a][8]][20] : 0)),
+          COL ((G[I].g[j[a][3]] & Y ? w[j[a][3]][20] : 0) |
+            (G[I].g[j[a][4]] & Y ? w[j[a][4]][20] : 0) |
+            (G[I].g[j[a][5]] & Y ? w[j[a][5]][20] : 0) |
+            (G[I].g[j[a][6]] & Y ? w[j[a][6]][20] : 0) |
+            (G[I].g[j[a][7]] & Y ? w[j[a][7]][20] : 0) |
+            (G[I].g[j[a][8]] & Y ? w[j[a][8]][20] : 0)));
+        if ((G[I].g[j[a][9]] | G[I].g[j[a][10]] | G[I].g[j[a][11]]) & Y)
+          printf (" r%dc%d",
+            ROW ((G[I].g[j[a][9]] & Y ? w[j[a][9]][20] : 0) |
+              (G[I].g[j[a][10]] & Y ? w[j[a][10]][20] : 0) |
+              (G[I].g[j[a][11]] & Y ? w[j[a][11]][20] : 0)),
+            COL ((G[I].g[j[a][9]] & Y ? w[j[a][9]][20] : 0) |
+              (G[I].g[j[a][10]] & Y ? w[j[a][10]][20] : 0) |
+              (G[I].g[j[a][11]] & Y ? w[j[a][11]][20] : 0)));
+        if ((G[I].g[j[a][12]] | G[I].g[j[a][13]] | G[I].g[j[a][14]]) & Y)
+          printf (" r%dc%d",
+            ROW ((G[I].g[j[a][12]] & Y ? w[j[a][12]][20] : 0) |
+              (G[I].g[j[a][13]] & Y ? w[j[a][13]][20] : 0) |
+              (G[I].g[j[a][14]] & Y ? w[j[a][14]][20] : 0)),
+            COL ((G[I].g[j[a][12]] & Y ? w[j[a][12]][20] : 0) |
+              (G[I].g[j[a][13]] & Y ? w[j[a][13]][20] : 0) |
+              (G[I].g[j[a][14]] & Y ? w[j[a][14]][20] : 0)));
+        printf ("\n");
+#endif
                              // Drop Locked triple Cell values from Units other Cell positions
         G[I].g[j[a][3]] &= ~Y;
         G[I].g[j[a][4]] &= ~Y;
@@ -2425,19 +2483,6 @@ START:
         G[I].g[j[a][12]] &= ~Y;
         G[I].g[j[a][13]] &= ~Y;
         G[I].g[j[a][14]] &= ~Y;
-#if RJ > 2
-        printf ("%d) Locked triple: %d @ r%dc%d => -%d @ r%dc%d r%dc%d\n",
-          G[I].p, b[Y], ROW (w[j[a][0]][20] | w[j[a][1]][20] | w[j[a][2]][20]),
-          COL (w[j[a][0]][20] | w[j[a][1]][20] | w[j[a][2]][20]), b[Y],
-          ROW (w[j[a][3]][20] | w[j[a][4]][20] | w[j[a][5]][20] |
-            w[j[a][6]][20] | w[j[a][7]][20] | w[j[a][8]][20]),
-          COL (w[j[a][3]][20] | w[j[a][4]][20] | w[j[a][5]][20] |
-            w[j[a][6]][20] | w[j[a][7]][20] | w[j[a][8]][20]),
-          ROW (w[j[a][9]][20] | w[j[a][10]][20] | w[j[a][11]][20] |
-            w[j[a][12]][20] | w[j[a][13]][20] | w[j[a][14]][20]),
-          COL (w[j[a][9]][20] | w[j[a][10]][20] | w[j[a][11]][20] |
-            w[j[a][12]][20] | w[j[a][13]][20] | w[j[a][14]][20]));
-#endif
         goto START;
       }
     }
@@ -2462,6 +2507,12 @@ START:
         {
           if (!(K[0] & K[1]))
             continue;        // Skip for Naked pair Cell values not found in Unit other Cell positions
+#if RJ > 2
+          printf ("%d) Naked pair: %s %d wise %d @ %s %s => -%d @ %s %s %s %s %s %s %s\n",
+            G[I].p, RCB, LBN (l[y][h[a][0]]), b[K[0]], S[l[y][h[a][0]]], S[l[y][h[a][1]]],
+            b[K[0]], S[l[y][h[a][2]]], S[l[y][h[a][3]]], S[l[y][h[a][4]]],
+            S[l[y][h[a][5]]], S[l[y][h[a][6]]], S[l[y][h[a][7]]], S[l[y][h[a][8]]]);
+#endif
                              // Drop Naked pair Cell values from Unit other Cell positions
           G[I].g[l[y][h[a][2]]] &= ~K[0];
           G[I].g[l[y][h[a][3]]] &= ~K[0];
@@ -2470,12 +2521,6 @@ START:
           G[I].g[l[y][h[a][6]]] &= ~K[0];
           G[I].g[l[y][h[a][7]]] &= ~K[0];
           G[I].g[l[y][h[a][8]]] &= ~K[0];
-#if RJ > 2
-          printf ("%d) Naked pair: %s %d wise %d @ %s %s => -%d @ %s %s %s %s %s %s %s\n",
-            G[I].p, RCB, LBN (l[y][h[a][0]]), b[K[0]], S[l[y][h[a][0]]], S[l[y][h[a][1]]],
-            b[K[0]], S[l[y][h[a][2]]], S[l[y][h[a][3]]], S[l[y][h[a][4]]],
-            S[l[y][h[a][5]]], S[l[y][h[a][6]]], S[l[y][h[a][7]]], S[l[y][h[a][8]]]);
-#endif
           goto START;
         }
         if (B[K[0] &= K[0] ^ K[1]] != 2)
@@ -2520,6 +2565,12 @@ START:
         {
           if (!(K[0] & K[1]))
             continue;        // Skip for Naked triple Cell values not found in Unit other Cell positions
+#if RJ > 2
+          printf ("%d) Naked triple: %s %d wise %d @ %s %s %s => -%d @ %s %s %s %s %s %s\n",
+            G[I].p, RCB, LBN (l[y][h[a][0]]), b[K[0]], S[l[y][h[a][0]]], S[l[y][h[a][1]]],
+            S[l[y][h[a][2]]], b[K[0]], S[l[y][h[a][3]]], S[l[y][h[a][4]]],
+            S[l[y][h[a][5]]], S[l[y][h[a][6]]], S[l[y][h[a][7]]], S[l[y][h[a][8]]]);
+#endif
                              // Drop Naked triple Cell values from Unit other Cell positions
           G[I].g[l[y][h[a][3]]] &= ~K[0];
           G[I].g[l[y][h[a][4]]] &= ~K[0];
@@ -2527,12 +2578,6 @@ START:
           G[I].g[l[y][h[a][6]]] &= ~K[0];
           G[I].g[l[y][h[a][7]]] &= ~K[0];
           G[I].g[l[y][h[a][8]]] &= ~K[0];
-#if RJ > 2
-          printf ("%d) Naked triple: %s %d wise %d @ %s %s %s => -%d @ %s %s %s %s %s %s\n",
-            G[I].p, RCB, LBN (l[y][h[a][0]]), b[K[0]], S[l[y][h[a][0]]], S[l[y][h[a][1]]],
-            S[l[y][h[a][2]]], b[K[0]], S[l[y][h[a][3]]], S[l[y][h[a][4]]],
-            S[l[y][h[a][5]]], S[l[y][h[a][6]]], S[l[y][h[a][7]]], S[l[y][h[a][8]]]);
-#endif
           goto START;
         }
         if (B[K[0] &= K[0] ^ K[1]] != 3)
@@ -2588,18 +2633,18 @@ START:
         {
           if (!(K[0] & K[1]))
             continue;        // Skip for Naked quad Cell values not found in Unit other Cell positions
-                             // Drop Naked quad Cell values from Unit other Cell positions
-          G[I].g[l[y][h[a][4]]] &= ~K[0];
-          G[I].g[l[y][h[a][5]]] &= ~K[0];
-          G[I].g[l[y][h[a][6]]] &= ~K[0];
-          G[I].g[l[y][h[a][7]]] &= ~K[0];
-          G[I].g[l[y][h[a][8]]] &= ~K[0];
 #if RJ > 2
           printf ("%d) Naked quad: %s %d wise %d @ %s %s %s %s => -%d @ %s %s %s %s %s\n",
             G[I].p, RCB, LBN (l[y][h[a][0]]), b[K[0]], S[l[y][h[a][0]]], S[l[y][h[a][1]]],
             S[l[y][h[a][2]]], S[l[y][h[a][3]]], b[K[0]], S[l[y][h[a][4]]], S[l[y][h[a][5]]],
             S[l[y][h[a][6]]], S[l[y][h[a][7]]], S[l[y][h[a][8]]]);
 #endif
+                             // Drop Naked quad Cell values from Unit other Cell positions
+          G[I].g[l[y][h[a][4]]] &= ~K[0];
+          G[I].g[l[y][h[a][5]]] &= ~K[0];
+          G[I].g[l[y][h[a][6]]] &= ~K[0];
+          G[I].g[l[y][h[a][7]]] &= ~K[0];
+          G[I].g[l[y][h[a][8]]] &= ~K[0];
           goto START;
         }
         if (B[K[0] &= K[0] ^ K[1]] != 4)
@@ -2642,7 +2687,7 @@ START:
       for (y = 0; y < 2; ++y)// Search either away Line or away Box 6 Cell positions wise
       {
         for (A = W[26][y]; A < W[32][y]; ++A)
-        {                    // Search Almost Locked Pair 54 mini-Lines away Line/Box 6 Cell positions wise
+        {                    // Search Almost Locked pair 54 mini-Lines away Line/Box 6 Cell positions wise
           if (!G[I].g[j[a][A]] || B[Y = G[I].g[j[a][A]] & ~(G[I].g[j[a][W[26][y] +
             (A < W[27][y])]] | G[I].g[j[a][W[27][y] + (A < W[28][y])]] |
             G[I].g[j[a][W[28][y] + (A < W[29][y])]] | G[I].g[j[a][W[29][y] +
@@ -2658,9 +2703,9 @@ START:
             G[I].g[K[3] = j[a][W[29][!y] + (Z < W[30][!y])]] |
             G[I].g[K[4] = j[a][W[30][!y] + (Z < W[31][!y])]]) & Y) &&
             B[G[I].g[j[a][A]]] < 3))
-            continue;        // Almost Locked Pair values not found in removal Cell positions
+            continue;        // Almost Locked pair values not found in removal Cell positions
 #if RJ > 2
-          printf ("%d) Almost Locked Pair: Box %d %s %d wise %d @ r%dc%d %s %s\n=> -%d @ ",
+          printf ("%d) Almost Locked pair: Box %d %s %d wise %d @ r%dc%d %s %s\n=> -%d @ ",
             G[I].p, BOX (j[a][y ? A : Z]), a < 27 ? "Row" : "Column",
             a < 27 ? ROW (w[j[a][y ? Z : A]][20]) : COL (w[j[a][y ? Z : A]][20]),
             b[Y], ROW (w[j[a][0]][20] | w[j[a][1]][20] | w[j[a][2]][20]),
@@ -2676,7 +2721,7 @@ START:
             printf (" => -%d @ %s", b[G[I].g[j[a][A]] ^ Y], S[j[a][A]]);
           printf ("\n");
 #endif
-                             // Drop Almost Locked Pair values from removal Cell positions
+                             // Drop Almost Locked pair values from removal Cell positions
           G[I].g[j[a][A]] &= Y;
           G[I].g[K[0]] &= ~Y;
           G[I].g[K[1]] &= ~Y;
@@ -2686,7 +2731,7 @@ START:
           goto START;
         }
         if (!G[I].g[j[a][0]] + !G[I].g[j[a][1]] + !G[I].g[j[a][2]] > 1)
-          continue;          // Skip Almost Locked Triple for unsolved Cell position <= 1 in mini-Line
+          continue;          // Skip Almost Locked triple for unsolved Cell position <= 1 in mini-Line
         for (A = W[26][y]; A < W[31][y]; ++A)
         {                    // Search 1st Cell position 54 mini-Lines away Line/Box wise
           if (!G[I].g[j[a][A]])
@@ -2712,9 +2757,9 @@ START:
                   G[I].g[K[2] = j[a][W[28][!y] + (M < W[29][!y]) + (N < W[30][!y])]] |
                   G[I].g[K[3] = j[a][W[29][!y] + (M < W[30][!y]) + (N < W[31][!y])]]) & Y) &&
                   B[G[I].g[j[a][A]] | G[I].g[j[a][L]]] < 4))
-                  continue;  // Almost Locked Triple values not found in removal Cell positions
+                  continue;  // Almost Locked triple values not found in removal Cell positions
 #if RJ > 2
-                printf ("%d) Almost Locked Triple: Box %d %s %d wise %d @ r%dc%d r%dc%d %s %s\n=> -%d @ ",
+                printf ("%d) Almost Locked triple: Box %d %s %d wise %d @ r%dc%d r%dc%d %s %s\n=> -%d @ ",
                   G[I].p, BOX (j[a][y ? A : M]), a < 27 ? "Row" : "Column",
                   a < 27 ? ROW (w[j[a][y ? M : A]][20]) : COL (w[j[a][y ? M : A]][20]),
                   b[Y], ROW (w[j[a][0]][20] | w[j[a][1]][20] | w[j[a][2]][20]),
@@ -2736,7 +2781,7 @@ START:
                     b[G[I].g[j[a][L]] ^ (G[I].g[j[a][L]] & Y)], S[j[a][L]]);
                 printf ("\n");
 #endif
-                             // Drop Almost Locked Triple values from removal Cell positions
+                             // Drop Almost Locked rriple values from removal Cell positions
                 G[I].g[j[a][A]] &= Y;
                 G[I].g[j[a][L]] &= Y;
                 G[I].g[K[0]] &= ~Y;
@@ -2752,7 +2797,7 @@ START:
           !G[I].g[j[a][6]] + !G[I].g[j[a][7]] + !G[I].g[j[a][8]] > 3 ||
           !G[I].g[j[a][9]] + !G[I].g[j[a][10]] + !G[I].g[j[a][11]] +
           !G[I].g[j[a][12]] + !G[I].g[j[a][13]] + !G[I].g[j[a][14]] > 3)
-          continue;          // Skip Almost Locked Quad for mini-Line away Line not unsolved Cell positions > three; or mini-Line away Box not unsolved Cell positions > three
+          continue;          // Skip Almost Locked quad for mini-Line away Line not unsolved Cell positions > three; or mini-Line away Box not unsolved Cell positions > three
         for (A = W[26][y]; A < W[30][y]; ++A)
         {                    // Search 1st Cell position 54 mini-Lines away Line/Box wise
           if (!G[I].g[j[a][A]])
@@ -2769,7 +2814,7 @@ START:
                 G[I].g[j[a][W[28][y] + (A < W[29][y]) + (L < W[30][y]) + (M < W[31][y])]])] != 4 ||
                              // Skip for either 3rd Cell position not unsolved; or 1st, 2nd and 3rd Cells values not four digits; or
                 !(G[I].g[j[a][A]] & Y) || !(G[I].g[j[a][L]] & Y) || !(G[I].g[j[a][M]] & Y))
-                continue;    // Almost Locked Quad values in either 1st or 2nd or 3rd Cells positions not found
+                continue;    // Almost Locked quad values in either 1st or 2nd or 3rd Cells positions not found
               for (N = W[26][!y]; N < W[30][!y]; ++N)
               {              // Search 4th Cell position 54 mini-Lines away Box/Line wise
                 if (!G[I].g[j[a][N]] || B[G[I].g[j[a][N]]] > 4)
@@ -2786,10 +2831,10 @@ START:
                       G[I].g[K[1] = j[a][W[27][!y] + (N < W[28][!y]) + (X < W[29][!y]) + (Z < W[30][!y])]] |
                       G[I].g[K[2] = j[a][W[28][!y] + (N < W[29][!y]) + (X < W[30][!y]) + (Z < W[31][!y])]]) & Y) &&
                       B[G[I].g[j[a][A]] | G[I].g[j[a][L]] | G[I].g[j[a][M]]] < 5))
-                             // Almost Locked Quad values not found in removal Cell positions
+                             // Almost Locked quad values not found in removal Cell positions
                       continue;
 #if RJ > 2
-                    printf ("%d) Almost Locked Quad: Box %d %s %d wise %d @ r%dc%d r%dc%d %s %s %s\n=> -%d @ ",
+                    printf ("%d) Almost Locked quad: Box %d %s %d wise %d @ r%dc%d r%dc%d %s %s %s\n=> -%d @ ",
                       G[I].p, BOX (j[a][y ? A : N]), a < 27 ? "Row" : "Column",
                       a < 27 ? ROW (w[j[a][y ? N : A]][20]) : COL (w[j[a][y ? N : A]][20]),
                       b[Y], ROW (w[j[a][0]][20] | w[j[a][1]][20] | w[j[a][2]][20]),
@@ -2813,7 +2858,7 @@ START:
                         b[G[I].g[j[a][M]] ^ (G[I].g[j[a][M]] & Y)], S[j[a][M]]);
                     printf ("\n");
 #endif
-                             // Drop Almost Locked Quad values from removal Cell positions
+                             // Drop Almost Locked quad values from removal Cell positions
                     G[I].g[j[a][A]] &= Y;
                     G[I].g[j[a][L]] &= Y;
                     G[I].g[j[a][M]] &= Y;
@@ -3069,8 +3114,88 @@ START:
               (!((k[1] | k[2] | k[3] | k[4] | k[5] | k[6] | k[7]) & M) &&
               !((k[8] | k[9] | k[10] | k[11] | k[12] | k[13] | k[14]) & a)))
               continue;
+#if RJ > 2
+            printf ("%d) M-%cing Type 1: %d @ %s %d @ %s SL %d @ r%dc%d SL %d @ %s r%dc%d",
+              G[I].p, ~K[0] ? 'R' : 'W', b[G[I].g[r[y]]], S[r[y]], b[G[I].g[X] | k[0]], S[X], b[a],
+              ROW (w[X][20] | w[A[0][L]][20]), COL (w[X][20] | w[A[0][L]][20]), b[M], S[X],
+              ROW ((G[I].g[Z] & M ? w[Z][20] : 0) |
+                (G[I].g[w[Z][W[3][N]]] & M ? w[w[Z][W[3][N]]][20] : 0) |
+                (G[I].g[w[Z][W[4][N]]] & M ? w[w[Z][W[4][N]]][20] : 0)),
+              COL ((G[I].g[Z] & M ? w[Z][20] : 0) |
+                (G[I].g[w[Z][W[3][N]]] & M ? w[w[Z][W[3][N]]][20] : 0) |
+                (G[I].g[w[Z][W[4][N]]] & M ? w[w[Z][W[4][N]]][20] : 0)));
             if (~K[0])
             {
+              if (k[0] - G[I].g[r[y]])
+                printf (" => -%d @ %s", b[k[0] - G[I].g[r[y]]], S[X]);
+              if ((G[I].g[w[r[y]][W[3][!N]]] | G[I].g[w[r[y]][W[4][!N]]] | G[I].g[w[Z][W[3][!N]]] |
+                G[I].g[w[Z][W[4][!N]]] | G[I].g[w[Z][W[4][!N]]] | G[I].g[K[0]] |
+                G[I].g[w[K[0]][W[3][!N]]] | G[I].g[w[K[0]][W[4][!N]]]) & M)
+                printf (" => -%d @ r%dc%d", b[M],
+                  ROW ((G[I].g[w[r[y]][W[3][!N]]] & M ? w[w[r[y]][W[3][!N]]][20] : 0) |
+                    (G[I].g[w[r[y]][W[4][!N]]] & M ? w[w[r[y]][W[4][!N]]][20] : 0) |
+                    (G[I].g[w[Z][W[3][!N]]] & M ? w[w[Z][W[3][!N]]][20] : 0) |
+                    (G[I].g[w[Z][W[4][!N]]] & M ? w[w[Z][W[4][!N]]][20] : 0) |
+                    (G[I].g[K[0]] & M ? w[K[0]][20] : 0) |
+                    (G[I].g[w[K[0]][W[3][!N]]] & M ? w[w[K[0]][W[3][!N]]][20] : 0) |
+                    (G[I].g[w[K[0]][W[4][!N]]] & M ? w[w[K[0]][W[4][!N]]][20] : 0)),
+                  COL ((G[I].g[w[r[y]][W[3][!N]]] & M ? w[w[r[y]][W[3][!N]]][20] : 0) |
+                    (G[I].g[w[r[y]][W[4][!N]]] & M ? w[w[r[y]][W[4][!N]]][20] : 0) |
+                    (G[I].g[w[Z][W[3][!N]]] & M ? w[w[Z][W[3][!N]]][20] : 0) |
+                    (G[I].g[w[Z][W[4][!N]]] & M ? w[w[Z][W[4][!N]]][20] : 0) |
+                    (G[I].g[K[0]] & M ? w[K[0]][20] : 0) |
+                    (G[I].g[w[K[0]][W[3][!N]]] & M ? w[w[K[0]][W[3][!N]]][20] : 0) |
+                    (G[I].g[w[K[0]][W[4][!N]]] & M ? w[w[K[0]][W[4][!N]]][20] : 0)));
+              if ((G[I].g[w[r[y]][W[3][!L]]] | G[I].g[w[r[y]][W[4][!L]]] |
+                G[I].g[w[A[0][L]][W[3][!L]]] | G[I].g[w[A[0][L]][W[4][!L]]] |
+                G[I].g[K[1]] | G[I].g[w[K[1]][W[3][!L]]] | G[I].g[w[K[1]][W[4][!L]]]) & a)
+                printf (" => -%d @ r%dc%d", b[a],
+                  ROW ((G[I].g[w[r[y]][W[3][!L]]] & a ? w[w[r[y]][W[3][!L]]][20] : 0) |
+                    (G[I].g[w[r[y]][W[4][!L]]] & a ? w[w[r[y]][W[4][!L]]][20] : 0) |
+                    (G[I].g[w[A[0][L]][W[3][!L]]] & a ? w[w[A[0][L]][W[3][!L]]][20] : 0) |
+                    (G[I].g[w[A[0][L]][W[4][!L]]] & a ? w[w[A[0][L]][W[4][!L]]][20] : 0) |
+                    (G[I].g[K[1]] & a ? w[K[1]][20] : 0) |
+                    (G[I].g[w[K[1]][W[3][!L]]] & a ? w[w[K[1]][W[3][!L]]][20] : 0) |
+                    (G[I].g[w[K[1]][W[4][!L]]] & a ? w[w[K[1]][W[4][!L]]][20] : 0)),
+                  COL ((G[I].g[w[r[y]][W[3][!L]]] & a ? w[w[r[y]][W[3][!L]]][20] : 0) |
+                    (G[I].g[w[r[y]][W[4][!L]]] & a ? w[w[r[y]][W[4][!L]]][20] : 0) |
+                    (G[I].g[w[A[0][L]][W[3][!L]]] & a ? w[w[A[0][L]][W[3][!L]]][20] : 0) |
+                    (G[I].g[w[A[0][L]][W[4][!L]]] & a ? w[w[A[0][L]][W[4][!L]]][20] : 0) |
+                    (G[I].g[K[1]] & a ? w[K[1]][20] : 0) |
+                    (G[I].g[w[K[1]][W[3][!L]]] & a ? w[w[K[1]][W[3][!L]]][20] : 0) |
+                    (G[I].g[w[K[1]][W[4][!L]]] & a ? w[w[K[1]][W[4][!L]]][20] : 0)));
+            }
+            else
+            {
+              if (~K[3])
+              {
+                printf (" => -%d @", b[M]);
+                if ((G[I].g[K[1]] | G[I].g[K[2]] | G[I].g[K[3]]) & M)
+                  printf (" r%dc%d", ROW ((G[I].g[K[1]] & M ? w[K[1]][20] : 0) |
+                      (G[I].g[K[2]] & M ? w[K[2]][20] : 0) |
+                      (G[I].g[K[3]] & M ? w[K[3]][20] : 0)),
+                    COL ((G[I].g[K[1]] & M ? w[K[1]][20] : 0) |
+                      (G[I].g[K[2]] & M ? w[K[2]][20] : 0) |
+                      (G[I].g[K[3]] & M ? w[K[3]][20] : 0)));
+                if ((G[I].g[K[4]] | G[I].g[K[5]]) & M)
+                  printf (" r%dc%d", ROW ((G[I].g[K[4]] & M ? w[K[4]][20] : 0) |
+                      (G[I].g[K[5]] & M ? w[K[5]][20] : 0)),
+                    COL ((G[I].g[K[4]] & M ? w[K[4]][20] : 0) |
+                      (G[I].g[K[5]] & M ? w[K[5]][20] : 0)));
+              }
+              else if (~K[1])
+              {
+                printf (" => -%d @", b[M]);
+                if (G[I].g[K[1]] & M)
+                  printf (" %s", S[K[1]]);
+                if (~K[2] && (G[I].g[K[2]] & M))
+                  printf (" %s", S[K[2]]);
+              }
+            }
+            printf ("\n");
+#endif
+            if (~K[0])
+            {                // Drop M-Ring Type A Cell values from Strong Link other Cell positions
               G[I].g[X] = G[I].g[r[y]];
               G[I].g[w[r[y]][W[3][!N]]] &= ~M;
               G[I].g[w[r[y]][W[4][!N]]] &= ~M;
@@ -3102,51 +3227,6 @@ START:
                 G[I].g[K[5]] &= ~M;
               }
             }
-            Q = r[y];
-#if RJ > 2
-            printf ("%d) M-%cing Type 1: %d @ %s %d @ %s SL %d @ r%dc%d SL %d @ %s r%dc%d => -",
-              G[I].p, ~K[0] ? 'R' : 'W', b[G[I].g[Q]], S[Q], b[G[I].g[X] | k[0]], S[X], b[a],
-              ROW (w[X][20] | w[A[0][L]][20]), COL (w[X][20] | w[A[0][L]][20]),
-              b[M], S[X], ROW (((G[I].g[Z] & M) ? w[Z][20] : 0) |
-              ((G[I].g[w[Z][W[3][N]]] & M) ? w[w[Z][W[3][N]]][20] : 0) |
-              ((G[I].g[w[Z][W[4][N]]] & M) ? w[w[Z][W[4][N]]][20] : 0)),
-              COL (((G[I].g[Z] & M) ? w[Z][20] : 0) |
-              ((G[I].g[w[Z][W[3][N]]] & M) ? w[w[Z][W[3][N]]][20] : 0) |
-              ((G[I].g[w[Z][W[4][N]]] & M) ? w[w[Z][W[4][N]]][20] : 0)));
-            if (~K[0])
-            {
-              if (k[0] - G[I].g[Q])
-                printf ("%d @ %s => -", b[k[0] - G[I].g[Q]], S[X]);
-              printf ("%d @ r%dc%d => -%d @ r%dc%d",
-                b[M], ROW (w[w[Q][W[3][!N]]][20] | w[w[Q][W[4][!N]]][20] |
-                w[w[Z][W[3][!N]]][20] | w[w[Z][W[4][!N]]][20] | w[K[0]][20] |
-                w[w[K[0]][W[3][!N]]][20] | w[w[K[0]][W[4][!N]]][20]),
-                COL (w[w[Q][W[3][!N]]][20] | w[w[Q][W[4][!N]]][20] |
-                w[w[Z][W[3][!N]]][20] | w[w[Z][W[4][!N]]][20] | w[K[0]][20] |
-                w[w[K[0]][W[3][!N]]][20] | w[w[K[0]][W[4][!N]]][20]), b[a],
-                ROW (w[w[Q][W[3][!L]]][20] | w[w[Q][W[4][!L]]][20] |
-                w[w[A[0][L]][W[3][!L]]][20] | w[w[A[0][L]][W[4][!L]]][20] |
-                w[K[1]][20] | w[w[K[1]][W[3][!L]]][20] | w[w[K[1]][W[4][!L]]][20]),
-                COL (w[w[Q][W[3][!L]]][20] | w[w[Q][W[4][!L]]][20] |
-                w[w[A[0][L]][W[3][!L]]][20] | w[w[A[0][L]][W[4][!L]]][20] |
-                w[K[1]][20] | w[w[K[1]][W[3][!L]]][20] | w[w[K[1]][W[4][!L]]][20]));
-            }
-            else
-            {
-              printf ("%d @", b[M]);
-              if (~K[3])
-                printf (" r%dc%d r%dc%d", ROW (w[K[1]][20] | w[K[2]][20] | w[K[3]][20]),
-                  COL (w[K[1]][20] | w[K[2]][20] | w[K[3]][20]),
-                  ROW (w[K[4]][20] | w[K[5]][20]), COL (w[K[4]][20] | w[K[5]][20]));
-              else if (~K[1])
-              {
-                printf (" %s", S[K[1]]);
-                if (~K[2])
-                  printf (" %s", S[K[2]]);
-              }
-            }
-            printf ("\n");
-#endif
             goto START;
           }
         }
